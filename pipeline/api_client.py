@@ -19,7 +19,7 @@ def login(url: str, email: str, password: str) -> str:
     data = response.json()
     return data["token"]
 
-def get_transfers(url: str, token: str) -> dict:
+def get_transfers(url: str, token: str, page: int, size: int) -> dict:
     try:
         response = requests.get(
             url = f"{url}/api/transfers",
@@ -27,7 +27,7 @@ def get_transfers(url: str, token: str) -> dict:
                 "Authorization": f"Bearer {token}"
             },
             params={
-                "page": 0, "size": 2
+                "page": page, "size": size
             },
             timeout = 15,
         )
