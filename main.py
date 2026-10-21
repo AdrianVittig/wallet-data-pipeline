@@ -1,29 +1,23 @@
-from pipeline.config import load_settings
-from pipeline.api_client import login, get_transfers
+from pipeline.config import load_settings, load_database_settings
+from pipeline.api_client import login
 from pipeline.load import load_transfers
 from pipeline.transform import transform_transfers
-from pipeline.config import load_database_settings
-from pipeline.database import check_database_connection
+from pipeline.extract import extract_all_transfers
 
 
 def main():
     db_settings = load_database_settings()
-    result = check_database_connection(db_settings)
-    print(f"Database connection: {result}")
-
     api_url, email, password = load_settings()
 
     token = login(api_url, email, password)
 
-    transfers = get_transfers(api_url, token, 0, 2)
-
-    print(f"Fetched {len(transfers['content'])} transfers")
-
-    correct, incorrect = transform_transfers(transfers['content'])
-
-    print(f"Valid: {len(correct)}, rejected: {len(incorrect)}")
+    transfers = extract_all_transfers(api_url, token, 2)
+    correct, incorrect = transform_transfers(transfers)
 
     inserted, skipped = load_transfers(db_settings, correct)
+
+    print(f"Fetched: {len(transfers)}")
+    print(f"Valid: {len(correct)}, rejected: {len(incorrect)}")
     print(f"Inserted: {inserted}, skipped: {skipped}")
 
 
