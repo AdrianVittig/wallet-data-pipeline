@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-
 def load_settings():
     load_dotenv()
 
@@ -33,4 +32,20 @@ def load_database_settings() -> dict:
         "dbname": dbname,
         "user": user,
         "password": password
+    }
+
+def load_pipeline_settings() -> dict:
+    load_dotenv()
+    pipeline_overlap_minutes = os.getenv("PIPELINE_OVERLAP_MINUTES")
+    if not pipeline_overlap_minutes:
+        raise ValueError("Missing pipeline overlap setting")
+    try:
+        pipeline_overlap_minutes = int(pipeline_overlap_minutes)
+    except ValueError:
+        raise ValueError("Pipeline overlap must be an integer!")
+
+    if pipeline_overlap_minutes < 0:
+        raise ValueError("Pipeline overlap must be non-negative")
+    return {
+        "pipeline_overlap_minutes": pipeline_overlap_minutes
     }

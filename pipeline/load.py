@@ -1,6 +1,15 @@
+from datetime import datetime
+
 import psycopg
 
-def load_transfers(db_settings: dict, transfers: list) -> tuple[int, int]:
+from pipeline.checkpoint import refresh_checkpoint
+
+
+def load_transfers(db_settings: dict,
+                   transfers: list,
+                   source: str,
+                   wallet_iban: str,
+                   processed_until: datetime) -> tuple[int, int]:
     with psycopg.connect(**db_settings) as connection:
         with connection.cursor() as cursor:
             inserted = 0
@@ -22,5 +31,6 @@ def load_transfers(db_settings: dict, transfers: list) -> tuple[int, int]:
                     inserted += 1
                 else:
                     skipped += 1
+            refresh_checkpoint(cursor, source, wallet_iban, processed_until)
 
     return inserted, skipped
