@@ -47,8 +47,11 @@ def test_validation_failure_preserves_rejected_record(monkeypatch):
     )
 
     transfer = {
-        "id": -59000,
+        "id": 59000,
         "amount": "abc",
+        "fromIban": wallet_iban,
+        "toIban": "TEST_RECIPIENT",
+        "category": "FOOD",
         "createdAt": "2026-01-01T10:30:00",
     }
 
@@ -145,7 +148,7 @@ def test_loading_failure_preserves_run_history(monkeypatch):
     )
 
     transfer = {
-        "id": -59001,
+        "id": 59001,
         "amount": "100.00",
         "fromIban": wallet_iban,
         "toIban": "TEST_RECIPIENT",
