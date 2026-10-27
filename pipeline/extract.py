@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from decimal import Decimal
 import requests
 
 def get_transfers(url: str,
@@ -31,7 +31,7 @@ def get_transfers(url: str,
         raise RuntimeError("Could not connect to Spring API") from e
     if response.status_code != 200:
         raise ValueError(f"Transfers failed with status code {response.status_code}")
-    data = response.json()
+    data = response.json(parse_float=Decimal)
     return data
 
 def extract_all_transfers(url: str,

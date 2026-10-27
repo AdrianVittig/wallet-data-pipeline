@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 import psycopg
+import simplejson
 from psycopg.types.json import Jsonb
 
 
@@ -60,6 +61,12 @@ def save_rejected_transfers(
     with psycopg.connect(**db_settings) as conn:
         with conn.cursor() as cursor:
             for record in rejected_records:
-                cursor.execute('''INSERT INTO rejected_transfers 
-                (run_id, record, reason) VALUES(%s, %s, %s)''',
-                               (run_id, Jsonb(record["record"]), record["reason"]))
+                cursor.execute(
+                    """INSERT INTO rejected_transfers (run_id, record, reason)
+                    VALUES (%s, %s, %s)""",
+                    (
+                        run_id,
+                        Jsonb(record["record"], dumps=simplejson.dumps),
+                        record["reason"],
+                    ),
+                )
