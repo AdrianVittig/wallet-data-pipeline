@@ -16,15 +16,21 @@ def load_transfers(db_settings: dict,
             skipped = 0
             for transfer in transfers:
                 query = '''INSERT INTO transfers 
-                (source_transfer_id, amount, 
+                (source, source_transfer_id, amount,
                 from_iban, to_iban, 
                 category, description, created_at)
-                 VALUES(%s, %s, %s, %s, %s, %s, %s) 
-                ON CONFLICT (source_transfer_id) DO NOTHING'''
-                values = (transfer["id"], transfer["amount"],
-                          transfer["fromIban"], transfer["toIban"],
-                          transfer["category"], transfer.get("description"),
-                          transfer["createdAt"])
+                 VALUES(%s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (source, source_transfer_id) DO NOTHING'''
+                values = (
+                    source,
+                    transfer["id"],
+                    transfer["amount"],
+                    transfer["fromIban"],
+                    transfer["toIban"],
+                    transfer["category"],
+                    transfer.get("description"),
+                    transfer["createdAt"],
+                )
 
                 cursor.execute(query, values)
                 if cursor.rowcount == 1:
