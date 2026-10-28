@@ -63,6 +63,10 @@ def test_future_checkpoint_stops_before_extraction(monkeypatch):
     assert len(finished_runs) == 1
     assert finished_runs[0]["status"] == "FAILED"
     assert finished_runs[0]["fetched"] == 0
+    assert finished_runs[0]["error_message"] == (
+        "Pipeline failed during checkpoint validation: "
+        "ValueError: Checkpoint is later than the current UTC time"
+    )
 
 def test_full_history_ignores_checkpoint(monkeypatch):
     extracted_params = {}

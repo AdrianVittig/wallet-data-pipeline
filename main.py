@@ -101,7 +101,7 @@ def main(full_history: bool = False) -> None:
             )
             loading_committed = True
 
-        except Exception:
+        except Exception as exc:
             try:
                 finish_run(
                     db_settings,
@@ -112,7 +112,8 @@ def main(full_history: bool = False) -> None:
                     rejected=rejected,
                     inserted=inserted,
                     skipped=skipped,
-                    error_message=f"Pipeline failed during {stage}.",
+                    error_message=f"Pipeline failed during {stage}: "
+                                  f"{type(exc).__name__}: {exc}",
                 )
             except Exception:
                 print(f"Could not save failure history for run {run_id}.")
