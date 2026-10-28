@@ -1,3 +1,4 @@
+import re
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
 
@@ -123,6 +124,15 @@ def transform_transfers(content: list) -> tuple[list, list]:
             incorrect.append({
                 "record": transfer,
                 "reason": "Timestamp must not include a timezone"
+            })
+            continue
+        if not re.fullmatch(
+                r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?",
+                transfer["createdAt"],
+        ):
+            incorrect.append({
+                "record": transfer,
+                "reason": "Invalid date format"
             })
             continue
 
