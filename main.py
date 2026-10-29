@@ -16,6 +16,7 @@ from pipeline.run_history import (
     save_rejected_transfers,
     start_run,
     update_run_context,
+    fail_interrupted_runs,
 )
 from pipeline.run_lock import pipeline_lock
 from pipeline.transform import transform_transfers
@@ -45,6 +46,9 @@ def main(full_history: bool = False) -> None:
 
             stage = "run lock acquisition"
             locks.enter_context(pipeline_lock(db_settings, source, wallet_iban))
+
+            stage = "interrupted run recovery"
+            fail_interrupted_runs(db_settings, source, wallet_iban, run_id)
 
             stage = "checkpoint lookup"
             checkpoint = get_checkpoint(db_settings, source, wallet_iban)

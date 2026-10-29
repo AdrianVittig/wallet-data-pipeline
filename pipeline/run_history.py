@@ -70,3 +70,31 @@ def save_rejected_transfers(
                         record["reason"],
                     ),
                 )
+
+def fail_interrupted_runs(
+        db_settings: dict,
+        source: str,
+        wallet_iban: str,
+        current_run_id: UUID
+) -> int:
+    with psycopg.connect(**db_settings) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute('''
+            UPDATE pipeline_runs
+            SET status = 'FAILED',
+            finished_at = CURRENT_TIMESTAMP,
+            error_message = %s
+            WHERE source = %s
+            AND wallet_iban = %s
+            AND status = 'RUNNING'
+            AND run_id <> %s''',
+                (
+                        "Run was interrupted before its final status was saved; "
+                        "transfers and checkpoint may have been committed.",
+                        source,
+                        wallet_iban,
+                        current_run_id,
+                )
+            )
+
+            return cursor.rowcount

@@ -57,6 +57,10 @@ def test_future_checkpoint_stops_before_extraction(monkeypatch):
         lambda *args, **kwargs: finished_runs.append(kwargs),
     )
 
+    monkeypatch.setattr(
+        pipeline_main, "fail_interrupted_runs", lambda *args: 0
+    )
+
     with pytest.raises(ValueError, match="Checkpoint is later"):
         pipeline_main.main()
 
@@ -108,6 +112,10 @@ def test_full_history_ignores_checkpoint(monkeypatch):
         pipeline_main,
         "update_run_context",
         lambda *args: None,
+    )
+
+    monkeypatch.setattr(
+        pipeline_main, "fail_interrupted_runs", lambda *args: 0
     )
 
     def fake_extract(*args, **kwargs):
